@@ -22,7 +22,9 @@ import {
   MenuItem,
   Typography,
   useTheme,
-  CardHeader
+  CardHeader,
+  Dialog,
+  DialogTitle
 } from '@mui/material';
 
 import Label from 'src/components/Label';
@@ -85,6 +87,30 @@ const applyFilters = (
 //   return accountList.slice(page * limit, page * limit + limit);
 // };
 
+function SimpleDialog(props) {
+  const { onClose, selectedValue, open } = props;
+
+  const handleClose = () => {
+    onClose(selectedValue);
+  };
+
+  const handleListItemClick = (value) => {
+    onClose(value);
+  };
+
+  return (
+    <Dialog onClose={handleClose} open={open}>
+      <DialogTitle >Do you want to update this account <span style={{color: 'red'}}>{selectedValue}</span> to premium!</DialogTitle>
+    </Dialog>
+  );
+}
+
+SimpleDialog.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
+  selectedValue: PropTypes.string.isRequired
+};
+
 const RecentOrdersTable = () => {
   const [selectedCryptoOrders, setSelectedCryptoOrders] = useState<string[]>(
     []
@@ -95,6 +121,18 @@ const RecentOrdersTable = () => {
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
+  const [open, setOpen] = useState(false);
+  const [selectedValue, setSelectedValue] = useState<string>('');
+
+  const handleClickOpen = (fullname: string) => {
+    setSelectedValue(fullname);
+    setOpen(true);
+  };
+
+  const handleClose = (value) => {
+    setOpen(false);
+    setSelectedValue(value);
+  };
 
   const statusOptions = [
     {
@@ -154,6 +192,9 @@ const RecentOrdersTable = () => {
     }
   };
 
+  const updateAccount = (id: string): void => {
+    console.log(id)
+  }
   const handlePageChange = (event: any, newPage: number): void => {
     setPage(newPage);
   };
@@ -336,11 +377,18 @@ const RecentOrdersTable = () => {
                         }}
                         color="inherit"
                         size="large"
+                        // onClick={() => updateAccount(account.id)}
+                        onClick={() => handleClickOpen(account.fullname)}
                       >
                         <UpgradeIcon fontSize="large" />
                       </IconButton>
                     </Tooltip>
                   </TableCell>
+                  <SimpleDialog
+                    selectedValue={selectedValue}
+                    open={open}
+                    onClose={handleClose}
+                  />
                 </TableRow>
               );
             })}

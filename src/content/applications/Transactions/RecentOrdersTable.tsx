@@ -116,8 +116,8 @@ const RecentOrdersTable = () => {
     []
   );
   const selectedBulkActions = selectedCryptoOrders.length > 0;
-  const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(10);
+  const [page, setPage] = useState<number>(0);
+  const [limit, setLimit] = useState<number>(100);
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
@@ -219,7 +219,8 @@ const RecentOrdersTable = () => {
   const accounts = useAppSelector(state => state.account.current);
   console.log("account: ", accounts.data)
   let count = 0
-
+  const accountFilter = accounts?.data?.filter((item) => Number(item.type_of_premium) === 1)
+  console.log("accountfilter", accountFilter)
   const dispatch = useAppDispatch();
   const fetchAccountList = async () => {
     const page_size = limit
@@ -283,7 +284,7 @@ const RecentOrdersTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {accounts?.data?.filter((item) => Number(item.type_of_premium) === 1).map((account) => {
+            {accountFilter.map((account) => {
               count++
               const isCryptoOrderSelected = selectedCryptoOrders.includes(
                 account.id
@@ -385,7 +386,7 @@ const RecentOrdersTable = () => {
       <Box p={2}>
         <TablePagination
           component="div"
-          count={accounts?.total_count}
+          count={accountFilter?.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}

@@ -1,5 +1,5 @@
 interface activeAccount {
-    id: string;
-    type_of_premium: string
+    user_id: string;
+    type_of_premium: number
 }
 export default activeAccount

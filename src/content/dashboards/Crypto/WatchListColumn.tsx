@@ -12,6 +12,10 @@ import Label from 'src/components/Label';
 import Text from 'src/components/Text';
 import Chart from 'react-apexcharts';
 import type { ApexOptions } from 'apexcharts';
+import { useAppSelector } from 'src/app/hooks';
+import { useAppDispatch } from 'src/app/store';
+import { getInformation } from 'src/features/dashboardSlice';
+import { useEffect } from 'react';
 
 const AvatarWrapper = styled(Avatar)(
   ({ theme }) => `
@@ -24,10 +28,9 @@ const AvatarWrapper = styled(Avatar)(
     border-radius: 60px;
     height: ${theme.spacing(5.5)};
     width: ${theme.spacing(5.5)};
-    background: ${
-      theme.palette.mode === 'dark'
-        ? theme.colors.alpha.trueWhite[30]
-        : alpha(theme.colors.alpha.black[100], 0.07)
+    background: ${theme.palette.mode === 'dark'
+      ? theme.colors.alpha.trueWhite[30]
+      : alpha(theme.colors.alpha.black[100], 0.07)
     };
   
     img {
@@ -43,7 +46,12 @@ const AvatarWrapper = styled(Avatar)(
 
 function WatchListColumn() {
   const theme = useTheme();
-
+  const dispatch = useAppDispatch();
+  const dashBoardInfor = useAppSelector(state => state.dashboard.current);
+  useEffect(() => {
+    dispatch(getInformation())
+  }, [])
+  console.log("first", dashBoardInfor)
   const chartOptions: ApexOptions = {
     chart: {
       background: 'transparent',
@@ -189,29 +197,11 @@ function WatchListColumn() {
                   mb: 1
                 }}
               >
-                $56,475.99
+                {dashBoardInfor.data.total_user}
               </Typography>
-              <Text color="success">
-                <b>+12.5%</b>
+              <Text color="error">
+                <b>account</b>
               </Text>
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start'
-              }}
-            >
-              <Label color="success">+$500</Label>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{
-                  pl: 1
-                }}
-              >
-                last 24h
-              </Typography>
             </Box>
           </Box>
           <Chart
@@ -242,7 +232,7 @@ function WatchListColumn() {
               </AvatarWrapper>
               <Box>
                 <Typography variant="h4" noWrap>
-                Total Premium Account
+                  Total Premium Account
                 </Typography>
               </Box>
             </Box>
@@ -261,29 +251,11 @@ function WatchListColumn() {
                   mb: 1
                 }}
               >
-                $1,968.00
+                {dashBoardInfor.data.total_premium_account}
               </Typography>
               <Text color="error">
-                <b>-3.24%</b>
+                <b>account is premium</b>
               </Text>
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start'
-              }}
-            >
-              <Label color="error">-$90</Label>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{
-                  pl: 1
-                }}
-              >
-                last 24h
-              </Typography>
             </Box>
           </Box>
           <Chart
@@ -314,7 +286,7 @@ function WatchListColumn() {
               </AvatarWrapper>
               <Box>
                 <Typography variant="h4" noWrap>
-                Total income
+                  Total income
                 </Typography>
                 <Typography variant="subtitle1" noWrap>
                   VND
@@ -336,29 +308,11 @@ function WatchListColumn() {
                   mb: 1
                 }}
               >
-                $23.00
+                {dashBoardInfor.data.total_income}
               </Typography>
               <Text color="error">
-                <b>-0.33%</b>
+                <b>vnđ</b>
               </Text>
-            </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-start'
-              }}
-            >
-              <Label color="error">-$5</Label>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{
-                  pl: 1
-                }}
-              >
-                last 24h
-              </Typography>
             </Box>
           </Box>
           <Chart

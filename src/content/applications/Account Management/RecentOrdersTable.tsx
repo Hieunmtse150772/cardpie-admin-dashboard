@@ -33,12 +33,18 @@ import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import UpgradeIcon from '@mui/icons-material/Upgrade';
 import BulkActions from './BulkActions';
 import { useAppDispatch } from 'src/app/store';
-import { getAccounts } from 'src/features/accountSlice';
+import { acctiveAccount, getAccounts } from 'src/features/accountSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import User from 'src/models/user.model';
 import { useAppSelector } from 'src/app/hooks';
 import AccountsDto from 'src/dtos/accounts.dto';
-
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import { Navigate, useNavigate } from 'react-router';
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 interface Filters {
   status?: CryptoOrderStatus;
 }
@@ -88,27 +94,51 @@ const applyFilters = (
 // };
 
 function SimpleDialog(props) {
-  const { onClose, selectedValue, open } = props;
-
+  const { onClose, selectedValue, open, accountPick } = props;
+  const dispatch = useAppDispatch();
   const handleClose = () => {
     onClose(selectedValue);
   };
+  const navigate = useNavigate();
 
   const handleListItemClick = (value) => {
     onClose(value);
   };
-
+  const updateAccount = async (account: User) => {
+    const result = await dispatch(acctiveAccount({
+      user_id: account.id,
+      type_of_premium: 1
+    }))
+    if (result) {
+      onClose(selectedValue);
+      alert('Update account successful');
+    }
+    navigate('/management/transactions');
+  }
   return (
-    <Dialog onClose={handleClose} open={open}>
-      <DialogTitle >Do you want to update this account <span style={{color: 'red'}}>{selectedValue}</span> to premium!</DialogTitle>
-    </Dialog>
+    <div>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle >Do you want to update this account to premium!</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure with your decision, after clicking OK, the account of <span style={{ color: 'red' }}>{selectedValue}</span>  will be updated to premium
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={() => updateAccount(accountPick)}>Yes</Button>
+        </DialogActions>
+      </Dialog>
+    </div>
   );
 }
+
 
 SimpleDialog.propTypes = {
   onClose: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
-  selectedValue: PropTypes.string.isRequired
+  selectedValue: PropTypes.string.isRequired,
+  accountPick: PropTypes.any.isRequired
 };
 
 const RecentOrdersTable = () => {
@@ -116,16 +146,18 @@ const RecentOrdersTable = () => {
     []
   );
   const selectedBulkActions = selectedCryptoOrders.length > 0;
-  const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(5);
+  const [page, setPage] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(10);
   const [filters, setFilters] = useState<Filters>({
     status: null
   });
   const [open, setOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string>('');
+  const [accountPick, setAccountPick] = useState<User>();
 
-  const handleClickOpen = (fullname: string) => {
-    setSelectedValue(fullname);
+  const handleClickOpen = (account: User) => {
+    setAccountPick(account);
+    setSelectedValue(account.fullname);
     setOpen(true);
   };
 
@@ -192,10 +224,8 @@ const RecentOrdersTable = () => {
     }
   };
 
-  const updateAccount = (id: string): void => {
-    console.log(id)
-  }
   const handlePageChange = (event: any, newPage: number): void => {
+    console.log("page", newPage)
     setPage(newPage);
   };
 
@@ -216,16 +246,18 @@ const RecentOrdersTable = () => {
   //   selectedCryptoOrders.length === cryptoOrders.length;
   const theme = useTheme();
   const accounts = useAppSelector(state => state.account.current);
-  console.log("account: ", accounts.data)
+  let count = 0
+
   const dispatch = useAppDispatch();
   const fetchAccountList = async () => {
+    const page_size = limit
     await dispatch(
-      getAccounts(page),
+      getAccounts({ page, page_size }),
     ).then(result => unwrapResult(result))
   }
   useEffect(() => {
     fetchAccountList();
-  }, [page])
+  }, [page, limit])
   return (
     <Card>
       {selectedBulkActions && (
@@ -270,17 +302,18 @@ const RecentOrdersTable = () => {
                   onChange={handleSelectAllCryptoOrders}
                 /> */}
               </TableCell>
-              <TableCell>User ID</TableCell>
+              <TableCell>No</TableCell>
               <TableCell>User Name</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Phone Number</TableCell>
-              <TableCell align="right">Is Prememium</TableCell>
-              <TableCell align="right">Status</TableCell>
+              <TableCell>Is Prememium</TableCell>
+              <TableCell align="center">Status</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {accounts?.data?.map((account) => {
+              count++
               const isCryptoOrderSelected = selectedCryptoOrders.includes(
                 account.id
               );
@@ -308,7 +341,7 @@ const RecentOrdersTable = () => {
                       gutterBottom
                       noWrap
                     >
-                      {account.id}
+                      {count}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -333,7 +366,7 @@ const RecentOrdersTable = () => {
                       {account.email}
                     </Typography>
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="left">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -344,7 +377,7 @@ const RecentOrdersTable = () => {
                       {account.phone_number}
                     </Typography>
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="left">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -352,10 +385,10 @@ const RecentOrdersTable = () => {
                       gutterBottom
                       noWrap
                     >
-                      {account.type_of_premium}
+                      {Number(account.type_of_premium) === 1 ? "Monthly" : "Chưa đăng kí premium"}
                     </Typography>
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="center">
                     <Typography
                       variant="body1"
                       fontWeight="bold"
@@ -366,7 +399,7 @@ const RecentOrdersTable = () => {
                       {account.status}
                     </Typography>
                   </TableCell>
-                  <TableCell align="right">
+                  {Number(account.type_of_premium) === 1 ? <TableCell align="center"><WorkspacePremiumIcon style={{ color: 'green' }}></WorkspacePremiumIcon></TableCell> : <TableCell align="center">
                     <Tooltip title="Update Account" arrow>
                       <IconButton
                         sx={{
@@ -378,14 +411,15 @@ const RecentOrdersTable = () => {
                         color="inherit"
                         size="large"
                         // onClick={() => updateAccount(account.id)}
-                        onClick={() => handleClickOpen(account.fullname)}
+                        onClick={() => handleClickOpen(account)}
                       >
                         <UpgradeIcon fontSize="large" />
                       </IconButton>
                     </Tooltip>
-                  </TableCell>
+                  </TableCell>}
                   <SimpleDialog
                     selectedValue={selectedValue}
+                    accountPick={accountPick}
                     open={open}
                     onClose={handleClose}
                   />
@@ -396,15 +430,15 @@ const RecentOrdersTable = () => {
         </Table>
       </TableContainer>
       <Box p={2}>
-        {/* <TablePagination
+        <TablePagination
           component="div"
-          count={filteredCryptoOrders.length}
+          count={accounts?.total_count}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
           rowsPerPage={limit}
-          rowsPerPageOptions={[5, 10, 25, 30]}
-        /> */}
+          rowsPerPageOptions={[10, 20, 50, 100]}
+        />
       </Box>
     </Card>
   );

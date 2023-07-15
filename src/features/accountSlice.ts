@@ -7,6 +7,7 @@ import {
 import { AxiosError } from 'axios';
 import AccountsDto from 'src/dtos/accounts.dto';
 import activeAccount from 'src/dtos/activeAccount.dto';
+import filterAccount from 'src/dtos/filterAccount.dto';
 import User from 'src/models/user.model';
 import accountServices from 'src/services/account.service';
 
@@ -18,9 +19,10 @@ interface AccountState {
 
 export const getAccounts = createAsyncThunk(
   'accounts',
-  async (page: number, { rejectWithValue }) => {
+  async (params: filterAccount, { rejectWithValue }) => {
     try {
-      const response = await accountServices.getAccounts(page);
+      const response = await accountServices.getAccounts(params);
+      console.log("first", response.data)
       return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -48,9 +50,8 @@ const initialState: AccountState = {
   error: '',
   current: {
     data: [] as User[],
-    currentPage: 0,
-    totalItems: 0,
-    totalPages: 0,
+    total_count: 0,
+    total_pages: 0,
   },
 };
 

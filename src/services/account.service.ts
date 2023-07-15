@@ -3,15 +3,16 @@ import { AxiosResponse } from 'axios';
 import axiosClient from './axiosClient';
 import AccountsDto from 'src/dtos/accounts.dto';
 import activeAccount from 'src/dtos/activeAccount.dto';
+import filterAccount from 'src/dtos/filterAccount.dto';
 
 const accountServices = {
-  getAccounts: (page: number): Promise<AxiosResponse<AccountsDto>> => {
+  getAccounts: (params: filterAccount): Promise<AxiosResponse<AccountsDto>> => {
     const url = `/user`;
-    return axiosClient.get(url, { params: { page } });
+    return axiosClient.get(url, { params });
   },
-  acctiveAccount: (payload: activeAccount):  Promise<AxiosResponse<AccountsDto>> => {
+  acctiveAccount: (params: activeAccount): Promise<AxiosResponse<AccountsDto>> => {
     const url = `/user/active`;
-    return axiosClient.post(url, { params: { payload } });
+    return axiosClient.post(url, params );
   },
 };
 

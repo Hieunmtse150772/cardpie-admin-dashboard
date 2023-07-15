@@ -1,7 +1,6 @@
 interface PagingDto {
-  totalItems: number;
-  totalPages: number;
-  currentPage: number;
+  total_count: number;
+  total_pages: number;
 }
 
 export default PagingDto;

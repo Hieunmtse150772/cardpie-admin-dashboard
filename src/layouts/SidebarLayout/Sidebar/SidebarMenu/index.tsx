@@ -31,7 +31,7 @@ import ChromeReaderModeTwoToneIcon from '@mui/icons-material/ChromeReaderModeTwo
 import WorkspacePremiumTwoToneIcon from '@mui/icons-material/WorkspacePremiumTwoTone';
 import CameraFrontTwoToneIcon from '@mui/icons-material/CameraFrontTwoTone';
 import DisplaySettingsTwoToneIcon from '@mui/icons-material/DisplaySettingsTwoTone';
-
+import RateReviewIcon from '@mui/icons-material/RateReview';
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
   .MuiList-root {
@@ -234,6 +234,17 @@ function SidebarMenu() {
                   startIcon={<AccountCircleTwoToneIcon />}
                 >
                   Account Management
+                </Button>
+              </ListItem>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to="/management/feedback"
+                  startIcon={<RateReviewIcon />}
+                >
+                  Feedback
                 </Button>
               </ListItem>
             </List>

@@ -64,6 +64,8 @@ const Avatars = Loader(
 );
 const Cards = Loader(lazy(() => import('src/content/pages/Components/Cards')));
 const Forms = Loader(lazy(() => import('src/content/pages/Components/Forms')));
+const FeedbackManage = Loader(lazy(() => import('src/content/applications/Feedback Management')));
+
 
 // Status
 
@@ -150,7 +152,10 @@ const routes: RouteObject[] = [
         path: 'transactions',
         element: <Transactions />
       },
-      ,
+      {
+        path: 'feedback',
+        element: <FeedbackManage />
+      },
       {
         path: 'account',
         element: <ManageAccountList />
